@@ -44,16 +44,16 @@ After each event, a **PDF attendance report** is automatically generated and sen
 
 ## 🧩 System Architecture
 
-```mermaid
 flowchart LR
-  A[Frontend: Next.js PWA] -->|JWT| B[(Backend API)]
-  B --> C[(Database: MongoDB/PostgreSQL)]
+  A[Frontend: Next.js PWA] -->|JWT Auth| B[Backend API (FastAPI/Express)]
+  B --> C[(Database: MongoDB / PostgreSQL)]
   B --> D[QR & Code Generator]
   B --> E[Attendance Manager]
   B --> F[Report Generator]
-  F -->|PDF| G[S3 Storage]
-  B --> H[Email Service (SMTP/SendGrid)]
-  B --> I[WhatsApp API (Meta/Twilio)]
-  B --> J[Web Push Notifications]
-  F -->|Report| H
-  F -->|Summary| I
+  F --> G[(S3 / Cloud Storage for PDFs)]
+  B --> H[Email Service - SMTP / SendGrid]
+  B --> I[WhatsApp API - Meta / Twilio]
+  B --> J[Web Push Notifications - OneSignal]
+  F --> H
+  F --> I
+
