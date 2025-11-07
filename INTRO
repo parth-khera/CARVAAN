@@ -1,0 +1,509 @@
+# Carvaan Connect — UI Wireframe (React), Architecture Diagram & Project README
+
+This canvas contains three deliverables:
+
+1. **React UI Wireframe / Mockup** (copy-paste into your codebase)
+2. **System Architecture Diagram** (Mermaid)
+3. **Complete Project Proposal / README** (ready for GitHub)
+
+---
+
+## 1) React UI Wireframe / Mockup (Single-file Component)
+
+> **Note:** This is a *frontend-only wireframe* showcasing layout, states, and flows. It uses Tailwind classes, `shadcn/ui` components, and `lucide-react` icons. Wire up to your backend later.
+
+```tsx
+// app/(club)/carvaan-connect/page.tsx
+// Framework: Next.js (App Router) + Tailwind + shadcn/ui + lucide-react
+// If using CRA/Vite, rename to CarvaanConnect.tsx and export default component.
+
+import { useState } from "react";
+import { Calendar, CheckCircle2, QrCode, KeyRound, Bell, Mail, Send, Users, FileDown, Shield, LogIn, LogOut, Plus, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+
+export default function CarvaanConnect() {
+  // --- Mock state ---
+  const [role, setRole] = useState<"student" | "faculty" | "admin">("student");
+  const [dailyCode, setDailyCode] = useState("");
+  const [notifEmail, setNotifEmail] = useState(true);
+  const [notifWhatsApp, setNotifWhatsApp] = useState(true);
+  const [notifWeb, setNotifWeb] = useState(true);
+
+  const events = [
+    { id: "EVT-2401", name: "Carvaan Open Mic", date: "2025-11-15", time: "17:30", venue: "Auditorium A", tags: ["music", "poetry"], registered: true },
+    { id: "EVT-2402", name: "Street Play Rehearsal", date: "2025-11-18", time: "16:00", venue: "Block C Lawn", tags: ["drama"], registered: false },
+    { id: "EVT-2403", name: "Annual Cultural Night", date: "2025-12-05", time: "19:00", venue: "Main Stage", tags: ["festival"], registered: false },
+  ];
+
+  const attendance = [
+    { eventId: "EVT-2400", event: "Garba Evening", date: "2025-10-28", recordId: "REC-9F2JK4" },
+    { eventId: "EVT-2399", event: "Nukkad Natak", date: "2025-10-20", recordId: "REC-71KQ02" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-neutral-50">
+      {/* Top Nav */}
+      <header className="sticky top-0 z-40 border-b bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-black text-white font-bold">CC</span>
+            <div>
+              <h1 className="text-xl font-semibold leading-tight">Carvaan Connect</h1>
+              <p className="text-xs text-neutral-500 -mt-1">Campus Events & Attendance</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select onValueChange={(v:any)=>setRole(v)} defaultValue={role}>
+              <SelectTrigger className="w-[160px]"><SelectValue placeholder="Role" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="student">Student</SelectItem>
+                <SelectItem value="faculty">Faculty</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm"><LogIn className="mr-2 h-4 w-4"/>Login</Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main */}
+      <main className="mx-auto grid max-w-7xl gap-6 p-4 md:grid-cols-12">
+        {/* Left Column: Events & Actions */}
+        <section className="md:col-span-8 space-y-6">
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-lg"><Calendar className="h-5 w-5"/>Upcoming Events</CardTitle>
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-neutral-400"/>
+                  <Input placeholder="Search events..." className="pl-8 w-[220px]"/>
+                </div>
+                {role!=="student" && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="sm"><Plus className="h-4 w-4 mr-2"/>New Event</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-lg">
+                      <DialogHeader>
+                        <DialogTitle>Create Event</DialogTitle>
+                      </DialogHeader>
+                      <div className="grid gap-3">
+                        <Input placeholder="Event name"/>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Input type="date"/>
+                          <Input type="time"/>
+                        </div>
+                        <Input placeholder="Venue"/>
+                        <Textarea placeholder="Description"/>
+                        <div className="flex justify-end">
+                          <Button>Create</Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              {events.map(e => (
+                <div key={e.id} className="flex items-center justify-between rounded-xl border p-3 hover:bg-neutral-50">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{e.name}</span>
+                      <Badge variant="secondary">{e.id}</Badge>
+                    </div>
+                    <p className="text-xs text-neutral-500">{e.date} • {e.time} • {e.venue}</p>
+                    <div className="mt-1 flex gap-1">{e.tags.map(t=> <Badge key={t} variant="outline" className="text-xs">{t}</Badge>)}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {role === "student" && (
+                      e.registered ? (
+                        <Badge className="bg-green-600">Registered</Badge>
+                      ) : (
+                        <Button size="sm">Register</Button>
+                      )
+                    )}
+                    {role !== "student" && (
+                      <>
+                        <Button variant="outline" size="sm"><Users className="mr-1 h-4 w-4"/>View List</Button>
+                        <Button variant="outline" size="sm"><FileDown className="mr-1 h-4 w-4"/>Export CSV</Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Attendance Actions */}
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg"><CheckCircle2 className="h-5 w-5"/>Attendance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="qr" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="qr" className="text-xs"><QrCode className="mr-1 h-4 w-4"/>Scan QR</TabsTrigger>
+                  <TabsTrigger value="code" className="text-xs"><KeyRound className="mr-1 h-4 w-4"/>Enter Code</TabsTrigger>
+                  <TabsTrigger value="records" className="text-xs"><Shield className="mr-1 h-4 w-4"/>My Records</TabsTrigger>
+                </TabsList>
+                <TabsContent value="qr" className="mt-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="rounded-2xl border p-6 text-center">
+                      <div className="mx-auto mb-3 h-40 w-full rounded-xl border border-dashed" />
+                      <p className="text-sm text-neutral-600">Camera preview placeholder. On mobile, request camera permission and scan event QR.</p>
+                      <div className="mt-3"><Button size="sm">Open Scanner</Button></div>
+                    </div>
+                    {role!=="student" && (
+                      <div className="rounded-2xl border p-6">
+                        <p className="mb-2 text-sm font-medium">Generate Event QR</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Select>
+                            <SelectTrigger><SelectValue placeholder="Select event" /></SelectTrigger>
+                            <SelectContent>
+                              {events.map(e=> <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <Select>
+                            <SelectTrigger><SelectValue placeholder="Valid for (mins)" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="30">30</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="mt-3 flex justify-end">
+                          <Button>Generate QR</Button>
+                        </div>
+                        <div className="mt-4 h-36 rounded-xl border border-dashed"/>
+                        <p className="mt-2 text-xs text-neutral-500">QR preview placeholder (embed PNG/SVG from backend).</p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+                <TabsContent value="code" className="mt-4">
+                  <div className="rounded-2xl border p-6">
+                    <p className="text-sm text-neutral-700">Enter today’s secret code to mark your attendance.</p>
+                    <div className="mt-3 flex gap-2">
+                      <Input placeholder="e.g., RAGA-7W" value={dailyCode} onChange={(e)=>setDailyCode(e.target.value)}/>
+                      <Button disabled={!dailyCode}>Submit</Button>
+                    </div>
+                    {role!=="student" && (
+                      <div className="mt-6 rounded-xl border p-4">
+                        <p className="text-xs text-neutral-500">Admin view</p>
+                        <div className="mt-2 grid grid-cols-2 gap-3">
+                          <Input placeholder="Generate new code (auto)" disabled/>
+                          <Button variant="outline">Refresh Code</Button>
+                        </div>
+                        <p className="mt-2 text-xs text-neutral-500">Codes rotate daily or per-session. Backend should enforce TTL and anti-reuse.</p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+                <TabsContent value="records" className="mt-4">
+                  <div className="grid gap-3">
+                    {attendance.map(a=> (
+                      <div key={a.recordId} className="flex items-center justify-between rounded-xl border p-3">
+                        <div>
+                          <p className="text-sm font-medium">{a.event}</p>
+                          <p className="text-xs text-neutral-500">{a.date}</p>
+                        </div>
+                        <Badge variant="outline">{a.recordId}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Right Column: Notifications & Admin Tools */}
+        <aside className="md:col-span-4 space-y-6">
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg"><Bell className="h-5 w-5"/>Notifications</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm"><strong>Email</strong><p className="text-xs text-neutral-500">Receive event updates and reports</p></div>
+                <Switch checked={notifEmail} onCheckedChange={setNotifEmail}/>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm"><strong>WhatsApp</strong><p className="text-xs text-neutral-500">Alerts via official club number</p></div>
+                <Switch checked={notifWhatsApp} onCheckedChange={setNotifWhatsApp}/>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm"><strong>Web Push</strong><p className="text-xs text-neutral-500">Browser notifications (PWA)</p></div>
+                <Switch checked={notifWeb} onCheckedChange={setNotifWeb}/>
+              </div>
+              <Button variant="outline" className="w-full"><Mail className="mr-2 h-4 w-4"/>Send Test Email</Button>
+              <Button className="w-full"><Send className="mr-2 h-4 w-4"/>Send Test WhatsApp</Button>
+            </CardContent>
+          </Card>
+
+          {role!=="student" && (
+            <Card className="rounded-2xl shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg"><FileDown className="h-5 w-5"/>Reports</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Select>
+                  <SelectTrigger><SelectValue placeholder="Select event to export" /></SelectTrigger>
+                  <SelectContent>
+                    {events.map(e=> <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline">Export CSV</Button>
+                  <Button>Generate PDF</Button>
+                </div>
+                <p className="text-xs text-neutral-500">PDF summary includes attendance list, counts, and sign-off note.</p>
+              </CardContent>
+            </Card>
+          )}
+
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg"><Shield className="h-5 w-5"/>Session</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-between">
+              <Button variant="outline"><LogOut className="mr-2 h-4 w-4"/>Logout</Button>
+              <Badge variant="secondary" className="text-xs">Role: {role}</Badge>
+            </CardContent>
+          </Card>
+        </aside>
+      </main>
+
+      <footer className="mx-auto max-w-7xl p-6 text-center text-xs text-neutral-500">
+        © {new Date().getFullYear()} Carvaan Club • Built for campus culture
+      </footer>
+    </div>
+  );
+}
+```
+
+**Implementation tips**
+
+* Replace placeholders with real API calls.
+* For QR scanning, use `navigator.mediaDevices.getUserMedia` + a JS QR lib (e.g., `jsQR`) or a packaged React scanner.
+* For push notifications, integrate a service worker + OneSignal/Web Push.
+* For WhatsApp, use Meta WhatsApp Cloud API or Twilio WhatsApp.
+* For PDF, render on server via `pdfkit`/`reportlab` and serve as downloadable file.
+
+---
+
+## 2) System Architecture Diagram (Mermaid)
+
+> Paste into a Mermaid-enabled Markdown renderer (e.g., GitHub, Markdown Preview Mermaid plugin) or convert via `mermaid-cli`.
+
+```mermaid
+flowchart LR
+  subgraph Client
+    A[Student PWA / Web] -- JWT --> B
+    A2[Faculty/Admin Dashboard] -- JWT --> B
+  end
+
+  subgraph Backend[API Server (FastAPI/Express)]
+    B[Auth & RBAC] --> C[Events Service]
+    B --> D[Attendance Service]
+    B --> E[Notification Service]
+    B --> F[Reports Service]
+    B --> G[QR/Code Generator]
+  end
+
+  C <--> DB[(Database: PostgreSQL/MongoDB)]
+  D <--> DB
+  F --> S3[(Object Storage: PDFs)]
+  E --> SMTP[(Email SMTP/SendGrid)]
+  E --> WA[(WhatsApp: Meta/Twilio)]
+  E --> PUSH[(Web Push: VAPID/OneSignal)]
+
+  G --> QRC[QR Image (SVG/PNG)]
+  D --> AUDIT[(Audit Log)]
+
+  subgraph Faculty/HOD/Principal
+    M[Email Inbox]
+    W[WhatsApp]
+  end
+
+  F --> M
+  E --> W
+```
+
+**Sequence: Attendance (QR)**
+
+```mermaid
+sequenceDiagram
+  participant Student
+  participant Frontend
+  participant API as API Server
+  participant Auth as Auth/RBAC
+  participant Att as Attendance Svc
+  participant Report as Reports Svc
+
+  Student->>Frontend: Open Scanner & Scan QR
+  Frontend->>API: POST /attendance/mark {token, eventId, nonce}
+  API->>Auth: Validate JWT & role
+  API->>Att: Verify QR nonce (TTL), mark present
+  Att-->>API: recordId, timestamp
+  API-->>Frontend: 200 OK {recordId}
+  opt Post-Event
+    API->>Report: Generate PDF summary
+    Report-->>Faculty/HOD: Email PDF + message
+    Report-->>WhatsApp: Notify
+  end
+```
+
+---
+
+## 3) Complete Project Proposal / README (Ready for GitHub)
+
+```markdown
+# Carvaan Connect – Cultural Club Events & Attendance Platform
+
+A production-ready web app for college cultural clubs to manage **events, registrations, verified attendance (QR/secret code)**, and **automated reporting** to faculty/HODs/principal via **Email, WhatsApp, and Web Push**. Built for Carvaan Club.
+
+## ✨ Key Features
+- **Event Management**: Create, publish, and search events; student registrations.
+- **Verified Attendance**: Two methods – **QR scan** (time-bound nonce) or **daily rotating secret code**.
+- **Automated Reports**: Generate **PDF attendance summaries** and email them to faculty, HODs, principal, and coordinators.
+- **Notifications**: Email (SMTP/SendGrid), WhatsApp (Meta Cloud/Twilio), and Web Push (OneSignal/VAPID).
+- **Dashboards**: Role-based UI for **Students, Faculty, Admins**.
+- **Exports**: CSV and signed PDF downloads.
+- **PWA**: Add to Home Screen, offline-ready assets, graceful camera access for QR.
+
+## 🧱 Architecture (High-level)
+- **Frontend**: Next.js (App Router) + Tailwind + shadcn/ui + lucide-react
+- **Backend**: FastAPI (Python) or Node.js (Express)
+- **DB**: PostgreSQL (with Prisma/SQLAlchemy) or MongoDB Atlas
+- **Auth**: JWT with RBAC (roles: student, faculty, admin, hod, principal)
+- **Reports**: Server-side PDF (`pdfkit`/`reportlab`)
+- **Notifications**: SMTP, WhatsApp API, Web Push
+- **Storage**: S3-compatible bucket for PDFs (or local in dev)
+
+## 🗃️ Suggested Data Model
+**Users**(`id`, name, email, phone, role, dept, year, section, whatsappOptIn, pushEndpoint, passwordHash, createdAt)
+
+**Events**(`id`, title, desc, date, time, venue, createdBy, tags[], isActive)
+
+**Registrations**(`id`, userId → Users.id, eventId → Events.id, status[registered|waitlist|cancelled], createdAt)
+
+**Attendance**(`id`, userId, eventId, mode[qr|code], recordId, timestamp, deviceInfo, ip, verifiedBy?)
+
+**QrSessions**(`id`, eventId, nonce, expiresAt, createdBy)
+
+**DailyCodes**(`id`, eventId, code, validFrom, validTo, createdBy)
+
+**AuditLogs**(`id`, actorId, action, entityType, entityId, meta JSON, timestamp)
+
+## 🔐 Security
+- Short-lived QR nonces (e.g., 5–10 mins), single-use.
+- Secret codes rotate per day/session; rate-limit submissions.
+- JWT with rotating refresh tokens; HTTPS everywhere.
+- Input validation, server-side checks, audit logs.
+- Signed PDFs (hash embedded) and tamper-evident record IDs (e.g., ULID + HMAC).
+
+## 🔔 Notification Flows
+- **On Event Publish**: Email + Web Push to subscribers; WhatsApp to opt-ins.
+- **On Attendance Marked**: Optional confirmation to student (email/push).
+- **Post-Event**: Auto-generate PDF; email to faculty/HOD/principal; WhatsApp summary message.
+
+## 📡 API Sketch
+```
+
+POST   /auth/login
+GET    /events?search=&active=
+POST   /events (admin)
+POST   /events/:id/register (student)
+POST   /attendance/qr/start (admin)           // returns {nonce, svg}
+POST   /attendance/mark                        // {eventId, nonce? code?}
+GET    /attendance/event/:id (faculty/admin)
+POST   /reports/event/:id/pdf (admin/faculty)
+POST   /notify/test-email (admin)
+POST   /notify/test-whatsapp (admin)
+
+```
+
+## 🔧 Environment Variables
+```
+
+# Backend
+
+APP_URL=
+JWT_SECRET=
+DB_URL=
+SMTP_HOST=
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=
+WHATSAPP_TOKEN=
+WHATSAPP_PHONE_ID=
+WHATSAPP_TO_TEMPLATE=
+PUSH_PUBLIC_KEY=
+PUSH_PRIVATE_KEY=
+S3_ENDPOINT=
+S3_BUCKET=
+S3_ACCESS_KEY=
+S3_SECRET_KEY=
+
+````
+
+## 🏗️ Local Setup (Example: Next.js + FastAPI)
+**Frontend**
+```bash
+pnpm create next-app carvaan-connect
+cd carvaan-connect && pnpm add lucide-react @radix-ui/react-icons
+# Install shadcn/ui as per docs, then generate components used above
+````
+
+**Backend**
+
+```bash
+uv venv && source .venv/bin/activate
+pip install fastapi uvicorn python-multipart pydantic[dotenv] sqlmodel[asyncio] asyncpg passlib pyjwt reportlab
+uvicorn app.main:app --reload
+```
+
+## 🧪 QA Checklist
+
+* [ ] QR session expires correctly; reuse rejected
+* [ ] Code submission rate-limited & logged
+* [ ] CSV/PDF exports match DB
+* [ ] Emails/WhatsApp delivered to correct recipients
+* [ ] RBAC enforced on every route
+* [ ] PWA camera works on Android/iOS latest
+
+## 🚀 Deployment
+
+* **Frontend**: Vercel (env secrets)
+* **Backend**: Railway/Render/Fly.io
+* **DB**: Supabase/Postgres or Mongo Atlas
+* **Domain**: `carvaan.yourcollege.edu` (CNAME to Vercel)
+
+## 📄 License
+
+MIT (update as per college policy)
+
+## 🙌 Credits
+
+Carvaan Club – Cultural Committee, Core Team & Coordinators.
+
+```
+
+---
+
+### What’s next?
+- Want me to **split the wireframe** into modular React components (`EventList`, `AttendancePanel`, `NotificationsPanel`) and scaffold a **FastAPI backend** with stub endpoints?
+- I can also generate a **PDF template** (ReportLab) and a **WhatsApp message template** for post-event summaries.
+
+```
