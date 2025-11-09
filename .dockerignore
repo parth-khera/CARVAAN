@@ -1,0 +1,10 @@
+node_modules
+client/node_modules
+client/build
+uploads
+data/*.json
+.env
+.git
+.gitignore
+*.log
+.DS_Store
